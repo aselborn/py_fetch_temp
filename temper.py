@@ -4,9 +4,11 @@ import getopt
 import json
 import requests
 import sqlite3
+import create_db
+import program
 
 # database_file = "C:/Users/nrobl/source/repos/tmpimport/db/Temperature.db"
-database_file = os.getcwd() + "\DbTemperatur.db"
+database_file = os.getcwd() + "/dbtemp.db"
 
 dataFil = "https://opendata-download-metobs.smhi.se/api/version/latest/parameter/1/station/52230/period/latest-months/data.csv"
 
@@ -58,9 +60,30 @@ def spara_stationer(stationer):
         conn.commit()
         conn.close()
 
-if __name__ == '__main__':
-    main()
-    stationer = download_stations()
-    spara_stationer(stationer)
-    
+def download_data(station_id):
+    headers = {'Accept':'application/json'}
+    response = requests.get("https://opendata-download-metobs.smhi.se/api/version/latest/parameter/1.json", headers=headers)
 
+
+def show_menu():
+    print("Välj alternativ : ")
+    print("1. visa vilka stationer som körs.")
+    print("2. Lägg till en station att köra")
+    print("3. hämta data för en speciell station")
+    print("4. ladda ner alla stationer igen.")
+    print("5. Avsluta")
+
+def program_info():
+    print("\nDetta program hämtar Temperaturdata från SMHI och lagrar i en databas.")
+
+if __name__ == '__main__':
+    db = create_db.ManageDB(database_file)
+    db.create_station_table()
+    db.create_data_table()
+    db.create_runconfig()
+    db.create_periods()
+
+    program = program.Program()
+    program.start()
+
+   
